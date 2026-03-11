@@ -14,6 +14,7 @@ import { useTheme } from 'next-themes';
 import { useUIStore } from '@/lib/store/ui-store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 const navItems = [
   {
@@ -37,6 +38,12 @@ export function Sidebar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { sidebarOpen, toggleSidebar } = useUIStore();
+
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
@@ -83,10 +90,10 @@ export function Sidebar() {
                     variant={isActive ? 'default' : 'ghost'}
                     className={cn(
                       'w-full justify-start gap-3',
-                      isActive && 'bg-sidebar-primary text-sidebar-primary-foreground'
+                      isActive &&
+                        'bg-sidebar-primary text-sidebar-primary-foreground'
                     )}
                     onClick={() => {
-                      // Close sidebar on mobile after navigation
                       if (window.innerWidth < 768) {
                         toggleSidebar();
                       }
@@ -102,24 +109,28 @@ export function Sidebar() {
 
           {/* Footer - Theme Toggle */}
           <div className="border-t border-sidebar-border p-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="h-4 w-4" />
-                  <span>Mode Terang</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="h-4 w-4" />
-                  <span>Mode Gelap</span>
-                </>
-              )}
-            </Button>
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-3"
+                onClick={() =>
+                  setTheme(theme === 'dark' ? 'light' : 'dark')
+                }
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="h-4 w-4" />
+                    <span>Mode Terang</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-4 w-4" />
+                    <span>Mode Gelap</span>
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </aside>

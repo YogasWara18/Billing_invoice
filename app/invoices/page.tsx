@@ -134,11 +134,11 @@ export default function InvoicesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Semua Status</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="pending">Tertunda</SelectItem>
-                    <SelectItem value="paid">Dibayar</SelectItem>
-                    <SelectItem value="overdue">Jatuh Tempo</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

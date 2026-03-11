@@ -216,7 +216,7 @@ export default function DashboardPage() {
                   <PieChart>
                     <Pie
                       data={pieData}
-                      cx="50%"
+                      cx="50%"@
                       cy="50%"
                       labelLine={false}
                       label={({ name, value }) => `${name}: ${value}`}
