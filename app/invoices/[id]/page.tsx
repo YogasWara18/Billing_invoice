@@ -26,10 +26,10 @@ export default function InvoiceDetailPage() {
     setIsMarking(true);
     try {
       await markAsPaidMutation.mutateAsync(invoice.id);
-      toast.success('Faktur ditandai sebagai dibayar!');
+      toast.success('Invoice marked as paid!');
       setIsMarking(false);
     } catch (error) {
-      toast.error('Gagal menandai faktur sebagai dibayar');
+      toast.error('Failed to mark invoice as paid');
       setIsMarking(false);
     }
   };
@@ -54,9 +54,9 @@ export default function InvoiceDetailPage() {
     return (
       <AppLayout>
         <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">Faktur tidak ditemukan</p>
+          <p className="text-muted-foreground mb-4">Invoice not found</p>
           <Link href="/invoices">
-            <Button>Kembali ke Faktur</Button>
+            <Button>Back to Invoices</Button>
           </Link>
         </div>
       </AppLayout>
@@ -75,7 +75,7 @@ export default function InvoiceDetailPage() {
           <Link href="/invoices">
             <Button variant="ghost" size="sm" className="gap-2 w-full sm:w-auto">
               <ArrowLeft className="h-4 w-4" />
-              Kembali ke Faktur
+              Back to Invoices
             </Button>
           </Link>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -86,7 +86,7 @@ export default function InvoiceDetailPage() {
             </Button>
             <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto text-sm">
               <Mail className="h-4 w-4" />
-              <span className="hidden md:inline">Kirim Email</span>
+              <span className="hidden md:inline">Send Email</span>
               <span className="md:hidden">Email</span>
             </Button>
             {invoice.status !== 'paid' && (
@@ -97,7 +97,7 @@ export default function InvoiceDetailPage() {
                 disabled={isMarking}
               >
                 <CheckCircle2 className="h-4 w-4" />
-                {isMarking ? 'Memproses...' : 'Tandai Dibayar'}
+                {isMarking ? 'Processing...' : 'Mark as Paid'}
               </Button>
             )}
           </div>
@@ -125,7 +125,7 @@ export default function InvoiceDetailPage() {
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                     }`}
                   >
-                    {invoice.status === 'paid' ? 'Dibayar' : invoice.status === 'pending' ? 'Tertunda' : invoice.status === 'overdue' ? 'Jatuh Tempo' : 'Draft'}
+                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                   </span>
                 </div>
               </CardHeader>
@@ -133,13 +133,13 @@ export default function InvoiceDetailPage() {
                 {/* Dates */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Tanggal Penerbitan</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Issue Date</p>
                     <p className="text-base sm:text-lg font-semibold">
                       {formatDate(invoice.issueDate, 'dd MMM yyyy')}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Tanggal Jatuh Tempo</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Due Date</p>
                     <p className="text-base sm:text-lg font-semibold">
                       {formatDate(invoice.dueDate, 'dd MMM yyyy')}
                     </p>
@@ -148,7 +148,7 @@ export default function InvoiceDetailPage() {
 
                 {/* Client Info */}
                 <div className="pt-4 border-t border-border">
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">Tagihan Untuk</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">Bill To</p>
                   <div>
                     <p className="font-semibold text-sm sm:text-base">{invoice.clientName}</p>
                     <p className="text-xs sm:text-sm text-muted-foreground break-all">{invoice.clientEmail}</p>
@@ -157,7 +157,7 @@ export default function InvoiceDetailPage() {
 
                 {/* Line Items */}
                 <div className="pt-4 border-t border-border">
-                  <p className="text-xs sm:text-sm font-semibold mb-4">Item Barang</p>
+                  <p className="text-xs sm:text-sm font-semibold mb-4">Line Items</p>
                   <div className="space-y-3">
                     {invoice.lineItems.map((item) => (
                       <div key={item.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs sm:text-sm">
@@ -180,7 +180,7 @@ export default function InvoiceDetailPage() {
                     <p>{formatCurrency(subtotal)}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground">Pajak (10%)</p>
+                    <p className="text-muted-foreground">Tax (10%)</p>
                     <p>{formatCurrency(tax)}</p>
                   </div>
                   <div className="flex items-center justify-between pt-2 border-t border-border">
@@ -192,7 +192,7 @@ export default function InvoiceDetailPage() {
                 {/* Notes */}
                 {invoice.notes && (
                   <div className="pt-4 border-t border-border">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2">Catatan</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2">Notes</p>
                     <p className="text-xs sm:text-sm">{invoice.notes}</p>
                   </div>
                 )}
@@ -205,19 +205,19 @@ export default function InvoiceDetailPage() {
             {/* Summary Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-xs sm:text-sm">Ringkasan Faktur</CardTitle>
+                <CardTitle className="text-xs sm:text-sm">Invoice Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">ID Faktur</p>
+                  <p className="text-xs text-muted-foreground mb-1">Invoice ID</p>
                   <p className="font-mono text-xs sm:text-sm font-semibold break-all">{invoice.id}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Nomor Faktur</p>
+                  <p className="text-xs text-muted-foreground mb-1">Invoice Number</p>
                   <p className="font-semibold text-xs sm:text-sm">{invoice.invoiceNumber}</p>
                 </div>
                 <div className="pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground mb-1">Jumlah Total</p>
+                  <p className="text-xs text-muted-foreground mb-1">Total Amount</p>
                   <p className="text-xl sm:text-2xl font-bold">{formatCurrency(invoice.amount)}</p>
                 </div>
                 <div>
@@ -233,7 +233,7 @@ export default function InvoiceDetailPage() {
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                     }`}
                   >
-                    {invoice.status === 'paid' ? 'Dibayar' : invoice.status === 'pending' ? 'Tertunda' : invoice.status === 'overdue' ? 'Jatuh Tempo' : 'Draft'}
+                    {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                   </span>
                 </div>
               </CardContent>
@@ -242,7 +242,7 @@ export default function InvoiceDetailPage() {
             {/* Timeline Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-xs sm:text-sm">Linimasa</CardTitle>
+                <CardTitle className="text-xs sm:text-sm">Timeline</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-3">

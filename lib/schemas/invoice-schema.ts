@@ -2,21 +2,21 @@ import { z } from 'zod';
 
 export const lineItemSchema = z.object({
   id: z.string(),
-  description: z.string().min(1, 'Deskripsi diperlukan'),
-  quantity: z.number().min(0.1, 'Kuantitas harus lebih besar dari 0'),
-  rate: z.number().min(0.01, 'Tarif harus lebih besar dari 0'),
+  description: z.string().min(1, 'Description is required'),
+  quantity: z.number().min(0.1, 'Quantity must be greater than 0'),
+  rate: z.number().min(0.01, 'Rate must be greater than 0'),
   amount: z.number(),
 });
 
 export const invoiceFormSchema = z.object({
-  invoiceNumber: z.string().min(1, 'Nomor faktur diperlukan'),
-  clientName: z.string().min(1, 'Nama klien diperlukan'),
-  clientEmail: z.string().email('Alamat email tidak valid'),
-  issueDate: z.date({ errorMap: () => ({ message: 'Tanggal penerbitan diperlukan' }) }),
-  dueDate: z.date({ errorMap: () => ({ message: 'Tanggal jatuh tempo diperlukan' }) }),
+  invoiceNumber: z.string().min(1, 'Invoice number is required'),
+  clientName: z.string().min(1, 'Client name is required'),
+  clientEmail: z.string().email('Invalid email address'),
+  issueDate: z.date({ errorMap: () => ({ message: 'Issue date is required' }) }),
+  dueDate: z.date({ errorMap: () => ({ message: 'Due date is required' }) }),
   description: z.string().optional(),
   notes: z.string().optional(),
-  lineItems: z.array(lineItemSchema).min(1, 'Minimal satu item barang diperlukan'),
+  lineItems: z.array(lineItemSchema).min(1, 'At least one line item is required'),
 });
 
 export type InvoiceFormData = z.infer<typeof invoiceFormSchema>;

@@ -97,11 +97,11 @@ export default function InvoicesPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Faktur</h1>
-            <p className="text-muted-foreground mt-1">Kelola semua faktur Anda di satu tempat</p>
+            <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
+            <p className="text-muted-foreground mt-1">Manage all your invoices in one place</p>
           </div>
           <Link href="/invoices/create">
-            <Button>Buat Faktur</Button>
+            <Button>Create Invoice</Button>
           </Link>
         </div>
 
@@ -110,11 +110,11 @@ export default function InvoicesPage() {
           <CardContent className="pt-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-4">
               <div className="flex-1">
-                <label className="text-sm font-medium mb-2 block">Cari</label>
+                <label className="text-sm font-medium mb-2 block">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    placeholder="Cari berdasarkan klien, nomor faktur, atau email..."
+                    placeholder="Search by client, invoice #, or email..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -134,7 +134,7 @@ export default function InvoicesPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="paid">Paid</SelectItem>
@@ -148,9 +148,9 @@ export default function InvoicesPage() {
 
         {/* Results Info */}
         <div className="text-sm text-muted-foreground">
-          Menampilkan {paginatedInvoices.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} hingga{' '}
-          {Math.min(currentPage * itemsPerPage, sortedInvoices.length)} dari {sortedInvoices.length}{' '}
-          faktur
+          Showing {paginatedInvoices.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to{' '}
+          {Math.min(currentPage * itemsPerPage, sortedInvoices.length)} of {sortedInvoices.length}{' '}
+          invoices
         </div>
 
         {/* Table */}
@@ -170,19 +170,19 @@ export default function InvoicesPage() {
                       <th className="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-muted" 
                           onClick={() => handleSort('client')}>
                         <div className="flex items-center gap-2">
-                          Klien {sortField === 'client' && (sortOrder === 'asc' ? '↑' : '↓')}
+                          Client {sortField === 'client' && (sortOrder === 'asc' ? '↑' : '↓')}
                         </div>
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-muted"
                           onClick={() => handleSort('date')}>
                         <div className="flex items-center gap-2">
-                          Tanggal {sortField === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
+                          Date {sortField === 'date' && (sortOrder === 'asc' ? '↑' : '↓')}
                         </div>
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-muted"
                           onClick={() => handleSort('amount')}>
                         <div className="flex items-center gap-2">
-                          Jumlah {sortField === 'amount' && (sortOrder === 'asc' ? '↑' : '↓')}
+                          Amount {sortField === 'amount' && (sortOrder === 'asc' ? '↑' : '↓')}
                         </div>
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold cursor-pointer hover:bg-muted"
@@ -191,7 +191,7 @@ export default function InvoicesPage() {
                           Status {sortField === 'status' && (sortOrder === 'asc' ? '↑' : '↓')}
                         </div>
                       </th>
-                      <th className="px-6 py-4 text-right text-sm font-semibold">Aksi</th>
+                      <th className="px-6 py-4 text-right text-sm font-semibold">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -224,13 +224,13 @@ export default function InvoicesPage() {
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                             }`}
                           >
-                            {invoice.status === 'paid' ? 'Dibayar' : invoice.status === 'pending' ? 'Tertunda' : invoice.status === 'overdue' ? 'Jatuh Tempo' : 'Draft'}
+                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <Link href={`/invoices/${invoice.id}`}>
                             <Button variant="ghost" size="sm">
-                              Lihat
+                              View
                               <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                           </Link>
@@ -242,7 +242,7 @@ export default function InvoicesPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Tidak ada faktur yang sesuai dengan filter Anda</p>
+                <p className="text-muted-foreground">No invoices found matching your filters</p>
               </div>
             )}
           </CardContent>
@@ -256,17 +256,17 @@ export default function InvoicesPage() {
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
             >
-              Sebelumnya
+              Previous
             </Button>
             <div className="text-sm text-muted-foreground">
-              Halaman {currentPage} dari {totalPages}
+              Page {currentPage} of {totalPages}
             </div>
             <Button
               variant="outline"
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
             >
-              Berikutnya
+              Next
             </Button>
           </div>
         )}

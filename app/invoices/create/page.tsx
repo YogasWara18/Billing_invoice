@@ -57,19 +57,30 @@ export default function CreateInvoicePage() {
   const onSubmit = async (data: InvoiceFormData) => {
     setIsSubmitting(true);
     try {
+      // Ensure all line item amounts are calculated correctly
+      const calculatedLineItems = data.lineItems.map((item) => ({
+        ...item,
+        amount: item.quantity * item.rate,
+      }));
+
+      const subtotalAmount = calculatedLineItems.reduce((sum, item) => sum + item.amount, 0);
+      const taxAmount = subtotalAmount * TAX_RATE;
+      const totalAmount = subtotalAmount + taxAmount;
+
       const newInvoice: Invoice = {
         id: Date.now().toString(),
         status: 'pending',
-        amount: total,
+        amount: totalAmount,
         ...data,
+        lineItems: calculatedLineItems,
       };
 
       await createInvoiceMutation.mutateAsync(newInvoice);
-      toast.success('Faktur berhasil dibuat!');
+      toast.success('Invoice created successfully!');
       reset();
       router.push('/invoices');
     } catch (error) {
-      toast.error('Gagal membuat faktur');
+      toast.error('Failed to create invoice');
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -87,8 +98,8 @@ export default function CreateInvoicePage() {
             </Button>
           </Link>
           <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Buat Faktur</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Buat faktur baru untuk klien Anda</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Create Invoice</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">Create a new invoice for your client</p>
           </div>
         </div>
 
@@ -99,34 +110,34 @@ export default function CreateInvoicePage() {
               {/* Invoice Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Detail Faktur</CardTitle>
-                  <CardDescription>Informasi dasar tentang faktur</CardDescription>
+                  <CardTitle>Invoice Details</CardTitle>
+                  <CardDescription>Basic invoice information</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <SimpleInput
-                      label="Nomor Faktur"
+                      label="Invoice Number"
                       placeholder="INV-001"
                       disabled
                       {...register('invoiceNumber')}
                       error={errors.invoiceNumber?.message}
                     />
                     <SimpleInput
-                      label="Deskripsi"
-                      placeholder="Mis: Layanan Pengembangan Web"
+                      label="Description"
+                      placeholder="E.g: Web Development Service"
                       {...register('description')}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <SimpleInput
-                      label="Tanggal Penerbitan"
+                      label="Issue Date"
                       type="date"
                       {...register('issueDate', { setValueAs: (value) => new Date(value) })}
                       error={errors.issueDate?.message}
                     />
                     <SimpleInput
-                      label="Tanggal Jatuh Tempo"
+                      label="Due Date"
                       type="date"
                       {...register('dueDate', { setValueAs: (value) => new Date(value) })}
                       error={errors.dueDate?.message}
@@ -138,20 +149,20 @@ export default function CreateInvoicePage() {
               {/* Client Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Informasi Klien</CardTitle>
-                  <CardDescription>Untuk siapa faktur ini?</CardDescription>
+                  <CardTitle>Client Information</CardTitle>
+                  <CardDescription>Who is this invoice for?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <SimpleInput
-                    label="Nama Klien"
-                    placeholder="Nama Klien atau Perusahaan"
+                    label="Client Name"
+                    placeholder="Client Name or Company"
                     {...register('clientName')}
                     error={errors.clientName?.message}
                   />
                   <SimpleInput
-                    label="Alamat Email"
+                    label="Email Address"
                     type="email"
-                    placeholder="klien@contoh.com"
+                    placeholder="client@example.com"
                     {...register('clientEmail')}
                     error={errors.clientEmail?.message}
                   />
@@ -161,18 +172,18 @@ export default function CreateInvoicePage() {
               {/* Line Items */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Item Barang</CardTitle>
-                  <CardDescription>Apa yang Anda tarik untuk?</CardDescription>
+                  <CardTitle>Line Items</CardTitle>
+                  <CardDescription>What are you charging for?</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs sm:text-sm">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left py-2 px-2 font-semibold">Deskripsi</th>
+                          <th className="text-left py-2 px-2 font-semibold">Description</th>
                           <th className="text-right py-2 px-2 font-semibold w-20 sm:w-24">Qty</th>
-                          <th className="text-right py-2 px-2 font-semibold w-20 sm:w-24">Tarif</th>
-                          <th className="text-right py-2 px-2 font-semibold w-20 sm:w-24">Jumlah</th>
+                          <th className="text-right py-2 px-2 font-semibold w-20 sm:w-24">Rate</th>
+                          <th className="text-right py-2 px-2 font-semibold w-20 sm:w-24">Amount</th>
                           <th className="text-center py-2 px-2 font-semibold w-10"></th>
                         </tr>
                       </thead>
@@ -182,7 +193,7 @@ export default function CreateInvoicePage() {
                             <td className="py-3 px-2">
                               <Input
                                 {...register(`lineItems.${index}.description`)}
-                                placeholder="Mis: Desain Web"
+                                placeholder="E.g: Web Design"
                                 className="text-xs sm:text-sm"
                               />
                               {errors.lineItems?.[index]?.description && (
@@ -234,8 +245,8 @@ export default function CreateInvoicePage() {
                     className="gap-2 w-full sm:w-auto text-xs sm:text-sm"
                   >
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Tambah Item Barang</span>
-                    <span className="sm:hidden">Tambah</span>
+                    <span className="hidden sm:inline">Add Line Item</span>
+                    <span className="sm:hidden">Add</span>
                   </Button>
 
                   {errors.lineItems && (
@@ -247,12 +258,12 @@ export default function CreateInvoicePage() {
               {/* Notes */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Catatan Tambahan</CardTitle>
+                  <CardTitle>Additional Notes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <textarea
                     {...register('notes')}
-                    placeholder="Terima kasih atas bisnis Anda! Syarat pembayaran, dll."
+                    placeholder="Thank you for your business! Payment terms, etc."
                     className="w-full p-3 border border-input rounded-md text-xs sm:text-sm"
                     rows={4}
                   />
@@ -264,7 +275,7 @@ export default function CreateInvoicePage() {
             <div>
               <Card className="sticky top-20">
                 <CardHeader>
-                  <CardTitle className="text-xs sm:text-base">Ringkasan Faktur</CardTitle>
+                  <CardTitle className="text-xs sm:text-base">Invoice Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2 text-xs sm:text-sm">
@@ -273,7 +284,7 @@ export default function CreateInvoicePage() {
                       <span className="text-right">{formatCurrency(subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Pajak (10%)</span>
+                      <span className="text-muted-foreground">Tax (10%)</span>
                       <span className="text-right">{formatCurrency(tax)}</span>
                     </div>
                     <div className="flex justify-between text-sm sm:text-lg font-bold pt-2 border-t border-border">
@@ -285,7 +296,7 @@ export default function CreateInvoicePage() {
                   <div className="flex flex-col sm:flex-row gap-2 pt-4">
                     <Link href="/invoices" className="flex-1">
                       <Button variant="outline" className="w-full text-xs sm:text-sm">
-                        Batal
+                        Cancel
                       </Button>
                     </Link>
                     <Button
@@ -293,7 +304,7 @@ export default function CreateInvoicePage() {
                       className="flex-1 text-xs sm:text-sm"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? 'Membuat...' : 'Buat Faktur'}
+                      {isSubmitting ? 'Creating...' : 'Create Invoice'}
                     </Button>
                   </div>
                 </CardContent>

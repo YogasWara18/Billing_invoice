@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -14,21 +15,20 @@ import { useTheme } from 'next-themes';
 import { useUIStore } from '@/lib/store/ui-store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 
 const navItems = [
   {
-    label: 'Dasbor',
+    label: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
   },
   {
-    label: 'Faktur',
+    label: 'Invoices',
     href: '/invoices',
     icon: FileText,
   },
   {
-    label: 'Buat Faktur',
+    label: 'Create Invoice',
     href: '/invoices/create',
     icon: Plus,
   },
@@ -38,9 +38,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { sidebarOpen, toggleSidebar } = useUIStore();
-
-
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -66,7 +65,7 @@ export function Sidebar() {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
             <h1 className="text-xl font-bold text-sidebar-foreground">
-              Pengelola Faktur
+              Invoice Manager
             </h1>
             <Button
               variant="ghost"
@@ -90,10 +89,10 @@ export function Sidebar() {
                     variant={isActive ? 'default' : 'ghost'}
                     className={cn(
                       'w-full justify-start gap-3',
-                      isActive &&
-                        'bg-sidebar-primary text-sidebar-primary-foreground'
+                      isActive && 'bg-sidebar-primary text-sidebar-primary-foreground'
                     )}
                     onClick={() => {
+                      // Close sidebar on mobile after navigation
                       if (window.innerWidth < 768) {
                         toggleSidebar();
                       }
@@ -114,19 +113,17 @@ export function Sidebar() {
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start gap-3"
-                onClick={() =>
-                  setTheme(theme === 'dark' ? 'light' : 'dark')
-                }
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               >
                 {theme === 'dark' ? (
                   <>
                     <Sun className="h-4 w-4" />
-                    <span>Mode Terang</span>
+                    <span>Light Mode</span>
                   </>
                 ) : (
                   <>
                     <Moon className="h-4 w-4" />
-                    <span>Mode Gelap</span>
+                    <span>Dark Mode</span>
                   </>
                 )}
               </Button>
